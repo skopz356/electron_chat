@@ -9,10 +9,7 @@
 </head>
 
 <body>
-    <% x.forEach(function(x){ %>
-    <%= x %>
-    <% }); %>
-
+    <button class="load-more">Načíst více</button>
 
     <form id="add-article">
         <label for="title">title</label>
@@ -24,16 +21,26 @@
         <input type="submit">
     </form>
 
+    <% articles.forEach(function(article){ %>
+    <article data-created="<%= article.createdAt %>">
+        <h1><%= article.title %></h1>
+        <% }); %>
+    </article>
+
+
     <script>
+        let ipcRenderer = require('electron').ipcRenderer;
 
         $("#add-article").submit((e) => {
             e.preventDefault();
-            //let formData = $(this).serialize();
             let formData = $("#add-article").serializeArray();
-            console.log(formData)
-
-            let ipcRenderer = require('electron').ipcRenderer;
             ipcRenderer.send('submitForm', formData);
+        });
+
+        $(".load-more").click((e) => {
+            e.preventDefault();
+            let first_created = $("article").first().data("created");
+            console.log(ipcRenderer.send("getArticles", first_created));
         });
 
 
