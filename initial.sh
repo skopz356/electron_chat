@@ -19,3 +19,5 @@
 npm install electron
 npm install --save sequelize
 npm install --save mysql2
+npm install ejs-electron
+npm install jquery --save

@@ -1,0 +1,44 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script>window.$ = window.jQuery = require('jquery');</script>
+</head>
+
+<body>
+    <% x.forEach(function(x){ %>
+    <%= x %>
+    <% }); %>
+
+
+    <form id="add-article">
+        <label for="title">title</label>
+        <input type="text" name="title">
+        <label for="text">text</label>
+        <input type="text" name="text">
+        <label for="subtitle">subtitle</label>
+        <input type="text" name="subtitle">
+        <input type="submit">
+    </form>
+
+    <script>
+
+        $("#add-article").submit((e) => {
+            e.preventDefault();
+            //let formData = $(this).serialize();
+            let formData = $("#add-article").serializeArray();
+            console.log(formData)
+
+            let ipcRenderer = require('electron').ipcRenderer;
+            ipcRenderer.send('submitForm', formData);
+        });
+
+
+    </script>
+
+</body>
+
+</html>

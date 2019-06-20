@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const seq = new Sequelize('electron_chat', 'root', 'mysql', {
+const seq = new Sequelize('electron_chat', 'root', '', {
     host: 'localhost',
     dialect: 'mysql'
 });

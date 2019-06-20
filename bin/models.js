@@ -17,4 +17,9 @@ Article.init({
     text: Sequelize.TEXT
 }, {sequelize, modelName: 'article'})
 
-sequelize.sync()
+sequelize.sync();
+
+module.exports = {
+    Article
+}
+
