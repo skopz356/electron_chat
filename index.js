@@ -1,16 +1,11 @@
 const models = require("./bin/models");
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 
 const ejs = require("ejs-electron");
 
-
-let articles;
-models.Article.findAll({
-}).then(objects => {
-    articles = objects
-});
-
-const { app, BrowserWindow, ipcMain } = require('electron')
-const path = require('path')
+const { app, BrowserWindow, ipcMain } = require('electron');
+const path = require('path');
 const url = require('url');
 
 
@@ -20,6 +15,9 @@ function isDev() {
 };
 function createWindow() {
     models.Article.findAll({
+        order:[
+            ["createdAt", "DESC"],
+        ]
     }).then(objects => {
         ejs.data("articles", objects);
         win = new BrowserWindow({
@@ -55,10 +53,9 @@ app.on('activate', () => {
     }
 })
 
-ipcMain.on('submitForm',  (event, data) => {
+ipcMain.on('submitForm', (event, data) => {
     let newData = {};
     for (let i = 0; i < data.length; i++) {
-        console.log(i);
         newData[data[i]["name"]] = data[i]["value"];
     }
 
@@ -66,5 +63,14 @@ ipcMain.on('submitForm',  (event, data) => {
 });
 
 ipcMain.on("getArticles", (event, data) => {
-    return "asdasdasd";
+    models.Article.findAll({
+        where: {
+            createdAt: {
+                [Op.gt]: data
+            }
+        }
+    }).then(articles => {
+        event.sender.send('asynchronous-reply', articles);
+    });
+
 });

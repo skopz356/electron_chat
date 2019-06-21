@@ -20,12 +20,15 @@
         <input type="text" name="subtitle">
         <input type="submit">
     </form>
-
-    <% articles.forEach(function(article){ %>
-    <article data-created="<%= article.createdAt %>">
-        <h1><%= article.title %></h1>
-        <% }); %>
-    </article>
+    <section class="articles">
+        <% articles.forEach(function(article){ %>
+        <article data-created="<%= article.createdAt %>">
+            <h1><%= article.title %></h1>
+            <h4><%= article.subtitle %></h4>
+            <%= article.text %>
+            <% }); %>
+        </article>
+    </section>
 
 
     <script>
@@ -40,7 +43,16 @@
         $(".load-more").click((e) => {
             e.preventDefault();
             let first_created = $("article").first().data("created");
-            console.log(ipcRenderer.send("getArticles", first_created));
+            ipcRenderer.send("getArticles", first_created);
+            ipcRenderer.on('asynchronous-reply', (event, articles) => {
+                for (article in articles) {
+                    $('<article/>', {
+                        id: 'some-id',
+                        class: 'some-class',
+                        title: `${article.title}`
+                    }).insertBefore('.articles article:first-child');
+                };
+            })
         });
 
 
