@@ -1,0 +1,7 @@
+<% articles.forEach(function(article){ %>
+<article data-created="<%= moment(article.createdAt).format('YYYY-MM-DD HH:mm:ss') %>">
+    <h1><%= article.title %></h1>
+    <h4><%= article.subtitle %></h4>
+    <%= article.text %>
+</article>
+<% }); %>

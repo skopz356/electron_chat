@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/dist/main.css">
     <title>Document</title>
     <script>window.$ = window.jQuery = require('jquery');</script>
 </head>
@@ -21,15 +22,8 @@
         <input type="submit">
     </form>
     <section class="articles">
-        <% articles.forEach(function(article){ %>
-        <article data-created="<%= article.createdAt %>">
-            <h1><%= article.title %></h1>
-            <h4><%= article.subtitle %></h4>
-            <%= article.text %>
-            <% }); %>
-        </article>
+        <%- include('components/article_box.ejs', {articles: articles}); %>
     </section>
-
 
     <script>
         let ipcRenderer = require('electron').ipcRenderer;
@@ -38,20 +32,18 @@
             e.preventDefault();
             let formData = $("#add-article").serializeArray();
             ipcRenderer.send('submitForm', formData);
+            $("#add-article").trigger("reset");
         });
 
         $(".load-more").click((e) => {
             e.preventDefault();
             let first_created = $("article").first().data("created");
             ipcRenderer.send("getArticles", first_created);
-            ipcRenderer.on('asynchronous-reply', (event, articles) => {
-                for (article in articles) {
-                    $('<article/>', {
-                        id: 'some-id',
-                        class: 'some-class',
-                        title: `${article.title}`
-                    }).insertBefore('.articles article:first-child');
-                };
+            ipcRenderer.on('asynchronous-reply', (event, articles_html) => {
+                console.log(articles_html);
+                let old = $(".articles").html();
+                let new_html =  articles_html + old;
+                $(".articles").html(new_html);
             })
         });
 

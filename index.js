@@ -3,11 +3,14 @@ const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
 const ejs = require("ejs-electron");
+const base_ejs = require("ejs");
+
+const sass = require('electron-middle-sass');
 
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const url = require('url');
-
+const moment = require("moment");
 
 let win;
 function isDev() {
@@ -15,11 +18,12 @@ function isDev() {
 };
 function createWindow() {
     models.Article.findAll({
-        order:[
+        order: [
             ["createdAt", "DESC"],
         ]
     }).then(objects => {
         ejs.data("articles", objects);
+        ejs.data("moment", moment);
         win = new BrowserWindow({
             width: 800, height: 600, webPreferences: {
                 nodeIntegration: true
@@ -46,7 +50,7 @@ app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit()
     }
-})
+});
 app.on('activate', () => {
     if (win === null) {
         createWindow()
@@ -62,15 +66,24 @@ ipcMain.on('submitForm', (event, data) => {
     models.Article.create(newData);
 });
 
-ipcMain.on("getArticles", (event, data) => {
-    models.Article.findAll({
-        where: {
-            createdAt: {
-                [Op.gt]: data
-            }
-        }
-    }).then(articles => {
-        event.sender.send('asynchronous-reply', articles);
-    });
+ipcMain.on("getArticles", (event, data) => {    
+    function after(articles) {
+       html = base_ejs.renderFile(__dirname + "/dist/components/article_box.ejs", { articles: articles, moment: moment }, (err, html) => {
+           event.sender.send('asynchronous-reply', html);
+       });
+   }
+   
+   if (data === null) {
+       models.Article.findAll({}).then(after);
+   } else {
+       models.Article.findAll({
+           where: {
+               createdAt: {
+                   [Op.gt]: data
+               }
+           }
+       }).then(after);
+   }
+    
 
 });
