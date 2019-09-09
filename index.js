@@ -1,11 +1,8 @@
 const models = require("./bin/models");
 const Sequelize = require('sequelize');
-const Op = Sequelize.Op;
-
 const ejs = require("ejs-electron");
 const base_ejs = require("ejs");
-
-const sass = require('electron-middle-sass');
+const Op = Sequelize.Op;
 
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
@@ -14,8 +11,10 @@ const moment = require("moment");
 
 let win;
 function isDev() {
+    return false;
     return process.mainModule.filename.indexOf('app.asar') === -1;
 };
+
 function createWindow() {
     models.Article.findAll({
         order: [
@@ -66,24 +65,24 @@ ipcMain.on('submitForm', (event, data) => {
     models.Article.create(newData);
 });
 
-ipcMain.on("getArticles", (event, data) => {    
+ipcMain.on("getArticles", (event, data) => {
     function after(articles) {
-       html = base_ejs.renderFile(__dirname + "/dist/components/article_box.ejs", { articles: articles, moment: moment }, (err, html) => {
-           event.sender.send('asynchronous-reply', html);
-       });
-   }
-   
-   if (data === null) {
-       models.Article.findAll({}).then(after);
-   } else {
-       models.Article.findAll({
-           where: {
-               createdAt: {
-                   [Op.gt]: data
-               }
-           }
-       }).then(after);
-   }
-    
+        html = base_ejs.renderFile(__dirname + "/dist/components/article_box.ejs", { articles: articles, moment: moment }, (err, html) => {
+            event.sender.send('asynchronous-reply', html);
+        });
+    }
+
+    if (data === null) {
+        models.Article.findAll({}).then(after);
+    } else {
+        models.Article.findAll({
+            where: {
+                createdAt: {
+                    [Op.gt]: data
+                }
+            }
+        }).then(after);
+    }
+
 
 });

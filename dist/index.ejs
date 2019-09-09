@@ -4,23 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="/dist/main.css">
+    <link rel="stylesheet" href="../dist/css/main.css">
     <title>Document</title>
     <script>window.$ = window.jQuery = require('jquery');</script>
 </head>
 
 <body>
-    <button class="load-more">Načíst více</button>
+    <div class="switcher">
+        <button class="btn-secondary" data-change="add">Přidat</button>
+        <button class="btn-secondary" data-change="filter">Filtrovat</button>
+    </div>
 
-    <form id="add-article">
-        <label for="title">title</label>
-        <input type="text" name="title">
-        <label for="text">text</label>
-        <input type="text" name="text">
-        <label for="subtitle">subtitle</label>
-        <input type="text" name="subtitle">
-        <input type="submit">
-    </form>
+    <button class="load-more btn-primary">Načíst více</button>
+    <div class="active" data-item="add">
+        <form id="add-article">
+            <label for="title" class="label">Název</label>
+            <input type="text" name="title" class="input">
+            <label for="text" class="label">Text</label>
+            <textarea type="text" name="text" class="input"></textarea>
+            <label for="subtitle" class="label">Podtitulek</label>
+            <input type="text" name="subtitle" class="input">
+            <input type="submit" class="input" value="Odeslat článek">
+        </form>
+    </div>
+
+    <div data-item="filter">
+        <div>
+            <label class="label">
+                Podle datumu
+            </label>
+            <select name="filter_date">
+                <option value="DESC">Od nejstaršího</option>
+                <option value="DESC">Od nejmladšího</option>
+            </select>
+        </div>
+        <div>
+            Vyhledejte 
+            <select name="filter_attr">
+                <option value="title">Název</option>
+                <option value="text">Text</option>
+                <option value="subtitle">Podtitulku</option>
+            </select>
+        </div>
+
+    </div>
+
+
     <section class="articles">
         <%- include('components/article_box.ejs', {articles: articles}); %>
     </section>
@@ -35,6 +64,15 @@
             $("#add-article").trigger("reset");
         });
 
+        $(".btn-secondary").click((e) => {
+            e.preventDefault();
+            let change = $(this).data("change");
+            console.log(change);
+            $("[data-item]").removeClass();
+            $(`[data-item="${change}"]`).addClass("active");
+
+        })
+
         $(".load-more").click((e) => {
             e.preventDefault();
             let first_created = $("article").first().data("created");
@@ -42,7 +80,7 @@
             ipcRenderer.on('asynchronous-reply', (event, articles_html) => {
                 console.log(articles_html);
                 let old = $(".articles").html();
-                let new_html =  articles_html + old;
+                let new_html = articles_html + old;
                 $(".articles").html(new_html);
             })
         });
