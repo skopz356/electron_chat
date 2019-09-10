@@ -35,7 +35,7 @@
             </label>
             <select name="filter_date">
                 <option value="DESC">Od nejstaršího</option>
-                <option value="DESC">Od nejmladšího</option>
+                <option value="ASC">Od nejmladšího</option>
             </select>
         </div>
         <div>
@@ -64,28 +64,32 @@
             $("#add-article").trigger("reset");
         });
 
-        $(".btn-secondary").click((e) => {
+        $(".switcher > button").click(function(e) {
             e.preventDefault();
             let change = $(this).data("change");
-            console.log(change);
             $("[data-item]").removeClass();
             $(`[data-item="${change}"]`).addClass("active");
+        });
 
-        })
+        $('[data-item="filter"] select').change(function(e) {
+            e.preventDefault();
+            let selected = $(this).find("option:selected").val();
+            ipcRenderer.send("getArticles", {"filter_date": selected});
+            ipcRenderer.on('asynchronous-reply', (event, articles_html) => {
+                $(".articles").html(articles_html);
+            });
+        });
 
         $(".load-more").click((e) => {
             e.preventDefault();
             let first_created = $("article").first().data("created");
             ipcRenderer.send("getArticles", first_created);
             ipcRenderer.on('asynchronous-reply', (event, articles_html) => {
-                console.log(articles_html);
                 let old = $(".articles").html();
                 let new_html = articles_html + old;
                 $(".articles").html(new_html);
             })
         });
-
-
     </script>
 
 </body>

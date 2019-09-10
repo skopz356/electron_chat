@@ -74,6 +74,13 @@ ipcMain.on("getArticles", (event, data) => {
 
     if (data === null) {
         models.Article.findAll({}).then(after);
+    }
+    else if("filter_date" in data){
+        models.Article.findAll({
+            order: [
+                data["filter_data"]
+            ]
+        }).then(after);
     } else {
         models.Article.findAll({
             where: {
@@ -83,6 +90,4 @@ ipcMain.on("getArticles", (event, data) => {
             }
         }).then(after);
     }
-
-
 });
