@@ -75,12 +75,23 @@ ipcMain.on("getArticles", (event, data) => {
     if (data === null) {
         models.Article.findAll({}).then(after);
     }
-    else if("filter_date" in data){
+    else if ("filter_date" in data) {
         models.Article.findAll({
             order: [
-                data["filter_data"]
+                ["createdAt", data["filter_date"]],
             ]
         }).then(after);
+    }
+    else if ("filter_attr" in data) {
+        let obj = {};
+        obj[data["filter_attr"][0]] = {
+            [Op.like]: data["filter_attr"][1]
+        }
+        models.Article.findAll({
+            where: obj
+        }).then(after);
+
+
     } else {
         models.Article.findAll({
             where: {

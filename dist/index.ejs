@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="../dist/css/main.css">
-    <title>Document</title>
     <script>window.$ = window.jQuery = require('jquery');</script>
+    <link rel="stylesheet" href="../dist/css/main.css">
+    <script src="../dist/js/script.js"></script>
+    <title>Document</title>
 </head>
 
 <body>
@@ -34,8 +35,9 @@
                 Podle datumu
             </label>
             <select name="filter_date">
-                <option value="DESC">Od nejstaršího</option>
-                <option value="ASC">Od nejmladšího</option>
+                <option value="">---</option>
+                <option value="ASC">Od nejstaršího</option>
+                <option value="DESC">Od nejmladšího</option>
             </select>
         </div>
         <div>
@@ -45,52 +47,14 @@
                 <option value="text">Text</option>
                 <option value="subtitle">Podtitulku</option>
             </select>
+            <input name="filter_value" type="text">
         </div>
-
     </div>
 
 
     <section class="articles">
         <%- include('components/article_box.ejs', {articles: articles}); %>
     </section>
-
-    <script>
-        let ipcRenderer = require('electron').ipcRenderer;
-
-        $("#add-article").submit((e) => {
-            e.preventDefault();
-            let formData = $("#add-article").serializeArray();
-            ipcRenderer.send('submitForm', formData);
-            $("#add-article").trigger("reset");
-        });
-
-        $(".switcher > button").click(function(e) {
-            e.preventDefault();
-            let change = $(this).data("change");
-            $("[data-item]").removeClass();
-            $(`[data-item="${change}"]`).addClass("active");
-        });
-
-        $('[data-item="filter"] select').change(function(e) {
-            e.preventDefault();
-            let selected = $(this).find("option:selected").val();
-            ipcRenderer.send("getArticles", {"filter_date": selected});
-            ipcRenderer.on('asynchronous-reply', (event, articles_html) => {
-                $(".articles").html(articles_html);
-            });
-        });
-
-        $(".load-more").click((e) => {
-            e.preventDefault();
-            let first_created = $("article").first().data("created");
-            ipcRenderer.send("getArticles", first_created);
-            ipcRenderer.on('asynchronous-reply', (event, articles_html) => {
-                let old = $(".articles").html();
-                let new_html = articles_html + old;
-                $(".articles").html(new_html);
-            })
-        });
-    </script>
 
 </body>
 
