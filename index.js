@@ -1,3 +1,4 @@
+process.setMaxListeners(15);
 const models = require("./bin/models");
 const Sequelize = require('sequelize');
 const ejs = require("ejs-electron");
@@ -16,11 +17,7 @@ function isDev() {
 };
 
 function createWindow() {
-    models.Article.findAll({
-        order: [
-            ["createdAt", "DESC"],
-        ]
-    }).then(objects => {
+    models.Article.all((objects) => {
         ejs.data("articles", objects);
         ejs.data("moment", moment);
         win = new BrowserWindow({
@@ -73,7 +70,7 @@ ipcMain.on("getArticles", (event, data) => {
     }
 
     if (data === null) {
-        models.Article.findAll({}).then(after);
+        models.Article.all(after)
     }
     else if ("filter_date" in data) {
         models.Article.findAll({
@@ -83,20 +80,22 @@ ipcMain.on("getArticles", (event, data) => {
         }).then(after);
     }
     else if ("filter_attr" in data) {
-        let obj = {};
-        obj[data["filter_attr"][0]] = {
-            [Op.like]: data["filter_attr"][1]
+        if (data["filter_attr"][1] != "") {
+            let obj = {};
+            obj[data["filter_attr"][0]] = {
+                [Op.like]: `%${data["filter_attr"][1]}%`
+            }
+            models.Article.findAll({
+                where: obj
+            }).then(after);
+        } else {
+            models.Article.all(after);
         }
-        models.Article.findAll({
-            where: obj
-        }).then(after);
-
-
-    } else {
+    } else if("first_created" in data){
         models.Article.findAll({
             where: {
                 createdAt: {
-                    [Op.gt]: data
+                    [Op.gt]: data["first_created"]
                 }
             }
         }).then(after);

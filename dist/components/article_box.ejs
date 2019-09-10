@@ -2,6 +2,9 @@
 <article data-created="<%= moment(article.createdAt).format('YYYY-MM-DD HH:mm:ss') %>">
     <h2><%= article.title %></h1>
     <h4><%= article.subtitle %></h4>
+    <span>
+        <%= moment(article.createdAt).format("MM.DD HH") %> hod
+    </span> <br>
     <%= article.text %>
 </article>
 <% }); %>

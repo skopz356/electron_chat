@@ -17,6 +17,14 @@ Article.init({
     text: Sequelize.TEXT
 }, {sequelize, modelName: 'article'})
 
+Article.all = (callback) => {
+    Article.findAll({
+        order: [
+            ["createdAt", "DESC"],
+        ]
+    }).then(callback)
+}
+
 sequelize.sync();
 
 module.exports = {
