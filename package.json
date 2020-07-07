@@ -16,7 +16,7 @@
     "sequelize": "^5.8.10"
   },
   "devDependencies": {
-    "electron": "^2.0.18",
+    "electron": "^9.1.0",
     "stable": "^0.1.8"
   }
 }
